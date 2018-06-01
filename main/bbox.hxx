@@ -10,6 +10,30 @@ class aabb // axis-aligned bounding box
 {
 private:
 	range_t data;
+	aabb(const range_t& range) : data(range) {}
+
+	// helper function for intersection calculation (axis-intersection)
+	//   if b.min > min (otherwise swap)
+	//     if b.min < max (otherwise empty; no need for extra check though, it will lead to result where min > max anyway)
+	//      -> (b.min, max)
+	//
+	//      +-------------+
+	//              +-------------+
+	//      ^       ^     ^
+	//     min    b.min  max    b.max
+	//
+	inline static const std::pair<coord_t, coord_t> axis_int(
+		const coord_t& min,
+		const coord_t& bmin,
+		const coord_t& max,
+		const coord_t& bmax)
+	{
+		return std::move(
+			(bmin > min)
+			? std::make_pair(bmin, max)
+			: std::make_pair(min, bmax));
+	}
+
 public:
 	aabb(const model_t& model) : data(calculate_aabb(model)) {}
 	aabb(const vertex_set_t& vertex_set) : data(calculate_aabb(vertex_set)) {}
@@ -76,8 +100,19 @@ public:
 	const aabb operator+(const vertex_set_t& vs) const
 	{ return *this | vs; }*/
 
-	// intersection
-	const aabb operator&(const aabb& box) const { return *this; }
+	// intersection:
+	const aabb operator&(const aabb& box) const
+	{
+		std::pair<coord_t, coord_t> ix =
+			axis_int(min().x(), box.min().x(), max().x(), box.max().x());
+		std::pair<coord_t, coord_t> iy =
+			axis_int(min().y(), box.min().y(), max().y(), box.max().y());
+		std::pair<coord_t, coord_t> iz =
+			axis_int(min().z(), box.min().z(), max().z(), box.max().z());
+		return aabb(range_t(
+			{ { ix.first, iy.first, iz.first } },
+			{ { ix.second, iy.second, iz.second } } ));
+	}
 
 	// is empty
 	const bool operator!() const
