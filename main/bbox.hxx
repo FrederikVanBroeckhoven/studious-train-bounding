@@ -19,41 +19,48 @@ public:
 
 	const aabb& operator=(const aabb& box) { data = box.data; }
 
-	const bool operator==(const aabb& box) const { return false; /*box.data == data*/; }
+	const bool operator==(const aabb& box) const { return box.data == data; }
 	const bool operator!=(const aabb& box) const { return !(*this == box); }
 
 	// contains
 	const bool operator>(const vertex_t& vert) const
 	{
-		return vert.x() > min_x() && vert.y() > min_y() && vert.z() > min_z()
-			&& vert.x() < max_x() && vert.y() < max_y() && vert.z() < max_z();
-
+		return vert.x() > min_x()
+			&& vert.y() > min_y()
+			&& vert.z() > min_z()
+			&& vert.x() < max_x()
+			&& vert.y() < max_y()
+			&& vert.z() < max_z();
 	}
 	const bool operator>(const model_t& model) const
 	{
-		for(mesh_t::const_iterator it = std::get<mesh_t>(model).begin(); it != std::get<mesh_t>(model).end(); it++)
-		{
-			if(!(*this > std::get<vertex_set_t>(model)[it -> a()]
-				&& *this > std::get<vertex_set_t>(model)[it -> b()]
-				&& *this > std::get<vertex_set_t>(model)[it -> c()]))
-			{
-				return false;
-			}
-		}
-		return true;
+		return std::all_of(
+			std::get<vertex_set_t>(model).begin(),
+			std::get<vertex_set_t>(model).end(),
+			[this] (const vertex_t& v) { return *this > v; }
+		);
 	}
 	const bool operator>(const aabb& box) const
 	{ return *this > min() && *this > max(); }
 
+	// contains or equal
+	const bool operator>=(const aabb& box) const
+	{ return *this == box || (*this > min() && *this > max()); }
+
 	// part-of
-	const bool operator<(const aabb& box) const {
-		return box > (*this);
-	}
+	const bool operator<(const aabb& box) const
+	{ return box > *this; }
+
+	// part-of or equal
+	const bool operator<=(const aabb& box) const
+	{ return box >= *this; }
 
 	// intersects
-	const bool operator&&(const aabb& box) const { return false; }
+	const bool operator&&(const aabb& box) const
+	{ return (*this > box.min()) ^ (*this > box.max()); }
 	// excludes
-	const bool operator||(const aabb& box) const { return false; }
+	const bool operator||(const aabb& box) const
+	{ return !(*this && box); }
 	
 	// union
 	const aabb operator|(const aabb& box) const

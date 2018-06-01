@@ -18,8 +18,8 @@ public:
 
 	typedef SuperT super_t;
 
-	template<typename VT2>
-	const super_t cross(const VT2& v) const
+	template<typename V2>
+	const super_t cross(const V2& v) const
 	{
 		const super_t& u = *(static_cast<const SuperT*>(this));
 		return { { // assume coords can be initialized with init-lists
@@ -28,6 +28,13 @@ public:
 			u.x() * v.y() - u.y() * v.x()
 		} };
 	}
+
+	template<typename V2>
+	const bool operator==(const V2& v) const
+	{ return coord == v.coord; }
+	template<typename V2>
+	const bool operator!=(const V2& v) const
+	{ return coord != v.coord; }
 
 	template<typename VT2>
 	const super_t to(const VT2& v) const // calculates vector from this to v
