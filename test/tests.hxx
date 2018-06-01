@@ -125,6 +125,7 @@ BOOST_AUTO_TEST_SUITE_END()
 #include "../algo/bounding.hxx"
 #include "../algo/surface.hxx"
 #include "../algo/volume.hxx"
+#include "../main/bbox.hxx"
 
 BOOST_AUTO_TEST_SUITE(algo)
 
