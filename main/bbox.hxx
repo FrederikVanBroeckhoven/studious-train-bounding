@@ -65,8 +65,27 @@ public:
 	// union
 	const aabb operator|(const aabb& box) const
 	{ return aabb( { min(), max(), box.min(), box.max() } ); }
+	const aabb operator|(const vertex_t& v) const
+	{ return aabb( { min(), max(), v } ); }
+	const aabb operator|(const vertex_set_t& vs) const
+	{ return *this | aabb(vs); }
+/*	const aabb operator+(const aabb& box) const
+	{ return *this | box; }
+	const aabb operator+(const vertex_t& v) const
+	{ return *this | v; }
+	const aabb operator+(const vertex_set_t& vs) const
+	{ return *this | vs; }*/
+
 	// intersection
 	const aabb operator&(const aabb& box) const { return *this; }
+
+	// is empty
+	const bool operator!() const
+	{
+		return min_x() >= max_x()
+			|| min_y() >= max_y()
+			|| min_z() >= max_z();
+	}
 
 	const range_t& range() const { return data; };
 
@@ -81,7 +100,6 @@ public:
 	const coord_t max_y() const { return max().y(); }
 	const coord_t max_z() const { return max().z(); }
 
-//	range_t& range() { return range; };
 };
 
 
