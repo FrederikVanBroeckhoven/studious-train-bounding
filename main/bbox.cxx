@@ -36,6 +36,16 @@ const bool aabb::operator>(const vertex_t& vert) const
 		&& vert.z() < max_z();
 }
 
+const bool aabb::operator>=(const vertex_t& vert) const
+{
+	return vert.x() >= min_x()
+		&& vert.y() >= min_y()
+		&& vert.z() >= min_z()
+		&& vert.x() <= max_x()
+		&& vert.y() <= max_y()
+		&& vert.z() <= max_z();
+}
+
 const bool aabb::operator>(const vertex_set_t& vert) const
 {
 	return std::all_of(
@@ -46,14 +56,27 @@ const bool aabb::operator>(const vertex_set_t& vert) const
 	);
 }
 
+const bool aabb::operator>=(const vertex_set_t& vert) const
+{
+	return std::all_of(
+		vert.begin(),
+		vert.end(),
+		[this] (const vertex_t& v)
+			{ return *this >= v; }
+	);
+}
+
 const bool aabb::operator>(const model_t& mod) const
 { return *this > mod.vertex_set(); }
 
 const bool aabb::operator>(const aabb& box) const
 { return *this > box.min() && *this > box.max(); }
 
+const bool aabb::operator>=(const model_t& mod) const
+{ return *this >= mod.vertex_set(); }
+
 const bool aabb::operator>=(const aabb& box) const
-{ return *this == box || (*this > box.min() && *this > box.max()); }
+{ return (*this >= box.min() && *this >= box.max()); }
 
 const bool aabb::operator<(const aabb& box) const
 { return box > *this; }
@@ -153,10 +176,10 @@ inline bool aabb::does_axis_int(
 	const coord_t& max,
 	const coord_t& bmax)
 {
-	return (bmin >= min && bmin <= max)
-		|| (bmax >= min && bmax <= max)
-		|| (min >= bmin && min <= bmax)
-		|| (max >= bmin && max <= bmax); 
+	return (bmin > min && bmin < max)
+		|| (bmax > min && bmax < max)
+		|| (min > bmin && min < bmax)
+		|| (max > bmin && max < bmax); 
 }
 
 const scalar_t aabb::len_x() const

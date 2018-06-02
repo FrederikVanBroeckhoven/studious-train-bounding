@@ -66,7 +66,6 @@ std::map<std::string, model_t> parse_files(const std::vector<std::string>& files
 	return std::move(models);
 }
 
-
 int main(int argc, const char *argv[])
 {
 	try
@@ -128,12 +127,79 @@ int main(int argc, const char *argv[])
 				std::cout << " object's surface: "  << calculate_surface(mod.second) << ":\n";
 				std::cout << " object's volume: "  << calculate_volume(mod.second) << ":\n";
 				boxes.emplace(
-					mod.first
+					mod.first,
 					std::move(box));
 			}
 		);
 
-		
+		if(boxes.size() <= 1)
+		{
+			std::cout << "Only one model given, no further comparisons performed\n";
+			return 0;
+		}
+
+		for(auto it = boxes.begin(); it != boxes.end(); it++)
+		{
+			auto nxt = std::next(it);
+			std::for_each(
+				nxt, boxes.end(),
+				[ &it ] (const std::pair<std::string, aabb>& it2)
+				{
+					const aabb& a = it -> second;
+					const aabb& b = it2.second;
+					std::cout << "\n";
+					std::cout << "comparing '" << (it -> first) << "' (a) with '" << it2.first << "' (b):\n";
+					aabb uni = (a | b);
+					std::cout << " a union b: " << uni << "\n"; 
+					std::cout << " a union b surface: " << uni.surface() << "\n"; 
+					std::cout << " a union b volume: " << uni.volume() << "\n"; 
+					aabb inr = (a & b);
+					std::cout << " a intersection b: ";
+					if(!inr)
+					{
+						std::cout << "empty\n";
+					}
+					else
+					{
+						std::cout << inr << "\n";
+						std::cout << " a intersection b surface: " << inr.surface() << "\n"; 
+						std::cout << " a intersection b volume: " << inr.volume() << "\n"; 
+					}
+					std::cout << " a equals b: " << std::boolalpha << (a == b) << "\n";
+					std::cout << " a fully contains b: " << std::boolalpha << (a > b) << "\n";
+					std::cout << " a fully contained by b: " << std::boolalpha << (a < b) << "\n";
+					std::cout << " a contains b: " << std::boolalpha << (a >= b) << "\n";
+					std::cout << " a contained by b: " << std::boolalpha << (a <= b) << "\n";
+					std::cout << " a intersects b: " << std::boolalpha << (a && b) << "\n";
+					std::cout << " a excludes b: " << std::boolalpha << (a || b) << "\n";
+				}
+			);
+		}
+
+		aabb full_uni = boxes.begin() -> second;
+		aabb full_inr = boxes.begin() -> second;
+		std::for_each(
+			boxes.begin(), boxes.end(),
+			[ &full_uni, &full_inr ] (const std::pair<std::string, aabb>& it)
+			{
+				full_uni |= it.second;
+				if(!!full_inr)
+				{
+					full_inr &= it.second;
+				}
+			}
+		);
+		std::cout << "\n"; 
+		std::cout << "union of all models: " << full_uni << "\n"; 
+		std::cout << "intersection of all models: ";
+		if(!full_inr)
+		{
+			std::cout << "empty\n";
+		}
+		else
+		{
+			std::cout << full_inr << "\n";
+		}
 	}
 	catch (const po::error &ex)
 	{

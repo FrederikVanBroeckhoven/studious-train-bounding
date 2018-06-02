@@ -31,13 +31,16 @@ public:
 	const bool operator==(const aabb& box) const;
 	const bool operator!=(const aabb& box) const;
 
-	// contains
+	// fully contains
 	const bool operator>(const vertex_t& vert) const;
 	const bool operator>(const vertex_set_t& vert) const;
 	const bool operator>(const model_t& mod) const;
 	const bool operator>(const aabb& box) const;
 
-	// contains or equal
+	// contains or on edge
+	const bool operator>=(const vertex_t& vert) const;
+	const bool operator>=(const vertex_set_t& vert) const;
+	const bool operator>=(const model_t& mod) const;
 	const bool operator>=(const aabb& box) const;
 
 	// contained
