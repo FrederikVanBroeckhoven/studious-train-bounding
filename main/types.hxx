@@ -1,9 +1,14 @@
 #ifndef TYPES_HEADER_FILE
 #define TYPES_HEADER_FILE
 
+#include <cmath>
 #include <vector>
 #include <tuple>
 #include <utility>
+
+typedef double							scalar_t;
+typedef scalar_t						coord_t;
+typedef size_t							index_t;
 
 // generic vertex wrapper
 
@@ -27,6 +32,15 @@ public:
 			u.x() * v.z() - u.z() * v.x(),
 			u.x() * v.y() - u.y() * v.x()
 		} };
+	}
+		
+	const scalar_t norm() const
+	{
+		const super_t& u = *(static_cast<const SuperT*>(this));
+		return std::sqrt(
+			(u.x() * u.x())
+			+ (u.y() * u.y())
+			+ (u.z() * u.z()));
 	}
 
 	template<typename V2>
@@ -165,10 +179,6 @@ public:
 	PT& b() { return std::get<1>(base_t::pnts); }
 	PT& c() { return std::get<2>(base_t::pnts); }
 };
-
-typedef double							scalar_t;
-typedef scalar_t						coord_t;
-typedef size_t							index_t;
 
 typedef vertex3d<coord_t, std::tuple<coord_t, coord_t, coord_t>>
 								vertex_t;

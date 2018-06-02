@@ -2,6 +2,7 @@
 #define BBOX_HEADER_FILE
 
 #include <initializer_list>
+#include <iostream>
 
 #include "types.hxx"
 #include "../algo/bounding.hxx"
@@ -12,26 +13,16 @@ private:
 	range_t data;
 	aabb(const range_t& range) : data(range) {}
 
-	// helper function for intersection calculation (axis-intersection)
-	//   if b.min > min (otherwise swap)
-	//     if b.min < max (otherwise empty; no need for extra check though, it will lead to result where min > max anyway)
-	//      -> (b.min, max)
-	//
-	//      +-------------+
-	//              +-------------+
-	//      ^       ^     ^
-	//     min    b.min  max    b.max
-	//
-	inline static const std::pair<coord_t, coord_t> axis_int(
+	inline static bool does_axis_int(
 		const coord_t& min,
 		const coord_t& bmin,
 		const coord_t& max,
 		const coord_t& bmax)
 	{
-		return std::move(
-			(bmin > min)
-			? std::make_pair(bmin, max)
-			: std::make_pair(min, bmax));
+		return (bmin >= min && bmin <= max)
+			|| (bmax >= min && bmax <= max)
+			|| (min >= bmin && min <= bmax)
+			|| (max >= bmin && max <= bmax); 
 	}
 
 public:
@@ -56,32 +47,38 @@ public:
 			&& vert.y() < max_y()
 			&& vert.z() < max_z();
 	}
-	const bool operator>(const model_t& model) const
+	const bool operator>(const vertex_set_t& vert) const
 	{
 		return std::all_of(
-			std::get<vertex_set_t>(model).begin(),
-			std::get<vertex_set_t>(model).end(),
+			vert.begin(),
+			vert.end(),
 			[this] (const vertex_t& v) { return *this > v; }
 		);
 	}
+	const bool operator>(const model_t& model) const
+	{ return *this > std::get<vertex_set_t>(model); }
 	const bool operator>(const aabb& box) const
-	{ return *this > min() && *this > max(); }
+	{ return *this > box.min() && *this > box.max(); }
 
 	// contains or equal
 	const bool operator>=(const aabb& box) const
-	{ return *this == box || (*this > min() && *this > max()); }
+	{ return *this == box || (*this > box.min() && *this > box.max()); }
 
-	// part-of
+	// contained
 	const bool operator<(const aabb& box) const
 	{ return box > *this; }
 
-	// part-of or equal
+	// contained or equal
 	const bool operator<=(const aabb& box) const
 	{ return box >= *this; }
 
 	// intersects
 	const bool operator&&(const aabb& box) const
-	{ return (*this > box.min()) ^ (*this > box.max()); }
+	{
+		return does_axis_int(min().x(), box.min().x(), max().x(), box.max().x())
+			&& does_axis_int(min().y(), box.min().y(), max().y(), box.max().y())
+			&& does_axis_int(min().z(), box.min().z(), max().z(), box.max().z());
+	}
 	// excludes
 	const bool operator||(const aabb& box) const
 	{ return !(*this && box); }
@@ -93,26 +90,32 @@ public:
 	{ return aabb( { min(), max(), v } ); }
 	const aabb operator|(const vertex_set_t& vs) const
 	{ return *this | aabb(vs); }
-/*	const aabb operator+(const aabb& box) const
-	{ return *this | box; }
-	const aabb operator+(const vertex_t& v) const
-	{ return *this | v; }
-	const aabb operator+(const vertex_set_t& vs) const
-	{ return *this | vs; }*/
+	// union-assign
+	const aabb& operator|=(const aabb& box)
+	{ *this = (*this | box); return *this; }
+	const aabb& operator|=(const vertex_t& v)
+	{ *this = (*this | v); return *this; }
+	const aabb& operator|=(const vertex_set_t& vs)
+	{ *this = (*this | vs); return *this; }
 
-	// intersection:
+	// intersection
 	const aabb operator&(const aabb& box) const
 	{
-		std::pair<coord_t, coord_t> ix =
-			axis_int(min().x(), box.min().x(), max().x(), box.max().x());
-		std::pair<coord_t, coord_t> iy =
-			axis_int(min().y(), box.min().y(), max().y(), box.max().y());
-		std::pair<coord_t, coord_t> iz =
-			axis_int(min().z(), box.min().z(), max().z(), box.max().z());
-		return aabb(range_t(
-			{ { ix.first, iy.first, iz.first } },
-			{ { ix.second, iy.second, iz.second } } ));
+		vertex_t mn = { {
+			std::max(min().x(), box.min().x()),
+			std::max(min().y(), box.min().y()),
+			std::max(min().z(), box.min().z())
+		} };
+		vertex_t mx = { {
+			std::min(max().x(), box.max().x()),
+			std::min(max().y(), box.max().y()),
+			std::min(max().z(), box.max().z())
+		} };
+		return aabb(range_t(mn, mx));
 	}
+	// intersection-assign
+	const aabb& operator&=(const aabb& box)
+	{ *this = (*this & box); return *this; }
 
 	// is empty
 	const bool operator!() const
@@ -134,6 +137,9 @@ public:
 	const coord_t max_x() const { return max().x(); }
 	const coord_t max_y() const { return max().y(); }
 	const coord_t max_z() const { return max().z(); }
+
+	friend std::ostream& operator<<(std::ostream& o, const aabb& bbox)
+	{ return o << "[" << bbox.min() << " - " << bbox.max() << "]"; }
 
 };
 
