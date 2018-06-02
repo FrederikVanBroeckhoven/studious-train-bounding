@@ -186,14 +186,14 @@ std::tuple<model_t, bool, bool> parse(It& f, It l) // note: first iterator gets 
 	static const obj_parser<It, skipper<It> > p;
 
 	// the actual data used to create the returned end-result.
-	model_t model;
+	model_t mod;
 
 	ast_obj result;
 	try
 	{
 		if(!(qi::phrase_parse(f, l, p, s, result) && f == l))
 		{
-			return std::tuple<model_t, bool, bool>(model, false, false);
+			return std::tuple<model_t, bool, bool>(mod, false, false);
 		}
 	}
 	catch(const qi::expectation_failure<It>& e)
@@ -201,13 +201,13 @@ std::tuple<model_t, bool, bool> parse(It& f, It l) // note: first iterator gets 
 		std::cerr << e.what() << "'\n";
 		return std::move(
 			std::tuple<model_t, bool, bool>(
-				std::move(model), false, false));
+				std::move(mod), false, false));
 	}
 
 	// syntax OK, semantics now
 	// first: attempt some preformance increase by preliminary allocating enough space
-	std::get<vertex_set_t>(model).reserve(result.verts.size());
-	std::get<mesh_t>(model).reserve(result.faces.size());
+	mod.vertex_set().reserve(result.verts.size());
+	mod.mesh().reserve(result.faces.size());
 
 	// use this to map the index of a vertex from the obj file to the index of the stored vertex
 	std::unordered_map<int, index_t> vert_idx_mapping;
@@ -250,8 +250,8 @@ std::tuple<model_t, bool, bool> parse(It& f, It l) // note: first iterator gets 
 			if(present_one == vert_idx_mapping.end())
 			{
 				// nope, not encountered. Add vertice to local storage, and use that index.
-				int local_idx = std::get<vertex_set_t>(model).size();
-				std::get<vertex_set_t>(model).push_back(
+				int local_idx = mod.vertex_set().size();
+				mod.vertex_set().push_back(
 					{ {
 						result.verts[idx].num[0],
 						result.verts[idx].num[1],
@@ -259,7 +259,7 @@ std::tuple<model_t, bool, bool> parse(It& f, It l) // note: first iterator gets 
 					} }
 				);
 
-				auto ins_or_not = vert_idx_mapping.emplace(idx, std::get<vertex_set_t>(model).size()-1);
+				auto ins_or_not = vert_idx_mapping.emplace(idx, local_idx);
 				if(!ins_or_not.second)
 				{
 					// something went wrong with the insertion which was not supposed to happen. PANIC!
@@ -267,7 +267,7 @@ std::tuple<model_t, bool, bool> parse(It& f, It l) // note: first iterator gets 
 					std::cerr << "Aborting parsing process\n";
 					return std::move(
 						std::tuple<model_t, bool, bool>(
-							std::move(model), false, false));
+							std::move(mod), false, false));
 				}
 				present_one = ins_or_not.first;
 			}
@@ -288,7 +288,7 @@ std::tuple<model_t, bool, bool> parse(It& f, It l) // note: first iterator gets 
 		}
 
 		// new face ok, put it into model
-		std::get<mesh_t>(model).push_back(
+		mod.mesh().push_back(
 			{ {
 				new_face[0],
 				new_face[1],
@@ -299,16 +299,16 @@ std::tuple<model_t, bool, bool> parse(It& f, It l) // note: first iterator gets 
 	}
 
 	// request to save up some space
-	std::get<vertex_set_t>(model).shrink_to_fit();
-	std::get<mesh_t>(model).shrink_to_fit();
+	mod.vertex_set().shrink_to_fit();
+	mod.mesh().shrink_to_fit();
 
 	bool semantics_ok =
-		std::get<mesh_t>(model).size() == result.faces.size()
-		&& std::get<vertex_set_t>(model).size() == result.verts.size();
+		mod.mesh().size() == result.faces.size()
+		&& mod.vertex_set().size() == result.verts.size();
 	// now construct the returning result from the faces/vertices arrays with size faces_num/vertices_num
 	return std::move(
 		std::tuple<model_t, bool, bool>(
-			std::move(model),
+			std::move(mod),
 			true, // syntax ok
 			semantics_ok)); 
 }

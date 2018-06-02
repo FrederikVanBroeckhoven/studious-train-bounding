@@ -5,24 +5,19 @@
 
 #include "../main/types.hxx"
 
-const scalar_t calculate_surface(const model_t& model)
+const scalar_t calculate_surface(const model_t& m)
 {
 	return std::accumulate(
-		std::get<mesh_t>(model).begin(),
-		std::get<mesh_t>(model).end(),
+		m.mesh().begin(),
+		m.mesh().end(),
 		scalar_t(0),
-		[ &model ] (scalar_t surf, const face_t& f)
+		[ &m ] (scalar_t surf, const face_t& f)
 		{
-			vertex_t v1 = std::get<vertex_set_t>(model)[f.a()];
-			vertex_t v2 = std::get<vertex_set_t>(model)[f.b()];
-			vertex_t v3 = std::get<vertex_set_t>(model)[f.c()];
+			vertex_t v1 = m.vertex_set()[f.a()];
+			vertex_t v2 = m.vertex_set()[f.b()];
+			vertex_t v3 = m.vertex_set()[f.c()];
 
 			return surf + ((v1.to(v2)).cross(v1.to(v3))).norm() / 2;
-//			return surf
-//				+ std::sqrt(
-//					(sc.x() * sc.x())
-//					+ (sc.y() * sc.y())
-//					+ (sc.z() * sc.z())) / 2;
 			
 		}
 	);

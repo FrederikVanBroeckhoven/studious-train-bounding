@@ -180,6 +180,19 @@ public:
 	PT& c() { return std::get<2>(base_t::pnts); }
 };
 
+template<typename VST, typename MT>
+struct model
+{
+public:
+	VST vertices;
+	MT faces;
+
+	MT& mesh() { return faces; }
+	VST& vertex_set() { return vertices; }
+	const MT& mesh() const { return faces; }
+	const VST& vertex_set() const { return vertices; }
+};
+
 typedef vertex3d<coord_t, std::tuple<coord_t, coord_t, coord_t>>
 								vertex_t;
 typedef tri_face<index_t, std::tuple<index_t, index_t, index_t>>
@@ -187,6 +200,7 @@ typedef tri_face<index_t, std::tuple<index_t, index_t, index_t>>
 typedef std::pair<vertex_t, vertex_t>				range_t;
 typedef std::vector<vertex_t>					vertex_set_t;
 typedef std::vector<face_t>					mesh_t;
-typedef std::pair<vertex_set_t, mesh_t>				model_t;
+//typedef std::pair<vertex_set_t, mesh_t>				model_t;
+typedef model<vertex_set_t, mesh_t>				model_t;
 
 #endif // TYPES_HEADER_FILE

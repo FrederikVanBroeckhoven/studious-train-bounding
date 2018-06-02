@@ -26,7 +26,7 @@ private:
 	}
 
 public:
-	aabb(const model_t& model) : data(calculate_aabb(model)) {}
+	aabb(const model_t& mod) : data(calculate_aabb(mod)) {}
 	aabb(const vertex_set_t& vertex_set) : data(calculate_aabb(vertex_set)) {}
 	aabb(std::initializer_list<vertex_t>& list) : data(calculate_aabb(list)) {}
 	aabb(const aabb& box) : data(box.data) {}
@@ -55,8 +55,8 @@ public:
 			[this] (const vertex_t& v) { return *this > v; }
 		);
 	}
-	const bool operator>(const model_t& model) const
-	{ return *this > std::get<vertex_set_t>(model); }
+	const bool operator>(const model_t& mod) const
+	{ return *this > mod.vertex_set(); }
 	const bool operator>(const aabb& box) const
 	{ return *this > box.min() && *this > box.max(); }
 

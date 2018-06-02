@@ -30,19 +30,19 @@ const range_t calculate_aabb(const It& begin, const It& end)
 	);
 }
 
-inline const range_t calculate_aabb(std::initializer_list<vertex_t> list)
+inline const range_t calculate_aabb(std::initializer_list<vertex_t> il)
 {
-	return std::move(calculate_aabb(list.begin(), list.end()));
+	return std::move(calculate_aabb(il.begin(), il.end()));
 }
 
-inline const range_t calculate_aabb(const vertex_set_t& vertex_set)
+inline const range_t calculate_aabb(const vertex_set_t& vs)
 {
-	return std::move(calculate_aabb(vertex_set.begin(), vertex_set.end()));
+	return std::move(calculate_aabb(vs.begin(), vs.end()));
 }
 
-inline const range_t calculate_aabb(const model_t& model)
+inline const range_t calculate_aabb(const model_t& m)
 {
-	return std::move(calculate_aabb(std::get<vertex_set_t>(model)));
+	return std::move(calculate_aabb(m.vertex_set()));
 }
 
 #endif // BOUNDING_HEADER_FILE

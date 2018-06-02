@@ -18,18 +18,18 @@ scalar_t signed_volume(const vertex_t& p1, const vertex_t& p2, const vertex_t& p
 
 }
 
-const scalar_t calculate_volume(const model_t& model)
+const scalar_t calculate_volume(const model_t& m)
 {
 	return std::accumulate(
-		std::get<mesh_t>(model).begin(),
-	       	std::get<mesh_t>(model).end(),
+		m.mesh().begin(),
+	       	m.mesh().end(),
 		scalar_t(0),
-		[ &model ] (scalar_t vol, const face_t& f)
+		[ &m ] (scalar_t vol, const face_t& f)
 		{
 			return vol + signed_volume(
-				std::get<vertex_set_t>(model)[f.a()],
-				std::get<vertex_set_t>(model)[f.b()],
-				std::get<vertex_set_t>(model)[f.c()]);
+				m.vertex_set()[f.a()],
+				m.vertex_set()[f.b()],
+				m.vertex_set()[f.c()]);
 		}
 	);
 }

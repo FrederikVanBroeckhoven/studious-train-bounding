@@ -237,27 +237,27 @@ BOOST_AUTO_TEST_SUITE(algo)
 		model_t equal = model_t(std::get<0>(res));
 		model_t bigger = model_t(std::get<0>(res));
 		std::transform(
-			std::get<vertex_set_t>(bigger).begin(),
-			std::get<vertex_set_t>(bigger).end(),
-			std::get<vertex_set_t>(bigger).begin(),
+			bigger.vertex_set().begin(),
+			bigger.vertex_set().end(),
+			bigger.vertex_set().begin(),
 			[] (vertex_t& v) { return vertex_t { { v.x() * 3 - 1, v.y() * 3 - 1, v.z() * 3 - 1  } }; } );
 		model_t smaller = model_t(std::get<0>(res));
 		std::transform(
-			std::get<vertex_set_t>(smaller).begin(),
-			std::get<vertex_set_t>(smaller).end(),
-			std::get<vertex_set_t>(smaller).begin(),
+			smaller.vertex_set().begin(),
+			smaller.vertex_set().end(),
+			smaller.vertex_set().begin(),
 			[] (vertex_t& v) { return vertex_t { { v.x() * 0.5 + 0.25, v.y() * 0.5 + 0.25, v.z() * 0.5 + 0.25  } }; } );
 		model_t cutting = model_t(std::get<0>(res));
 		std::transform(
-			std::get<vertex_set_t>(cutting).begin(),
-			std::get<vertex_set_t>(cutting).end(),
-			std::get<vertex_set_t>(cutting).begin(),
+			cutting.vertex_set().begin(),
+			cutting.vertex_set().end(),
+			cutting.vertex_set().begin(),
 			[] (vertex_t& v) { return vertex_t { { v.x() - 0.5, v.y() - 0.5, v.z() - 0.5  } }; } );
 		model_t outside = model_t(std::get<0>(res));
 		std::transform(
-			std::get<vertex_set_t>(outside).begin(),
-			std::get<vertex_set_t>(outside).end(),
-			std::get<vertex_set_t>(outside).begin(),
+			outside.vertex_set().begin(),
+			outside.vertex_set().end(),
+			outside.vertex_set().begin(),
 			[] (vertex_t& v) { return vertex_t { { v.x() + 2, v.y() + 2, v.z() + 2  } }; } );
 
 
@@ -288,27 +288,27 @@ BOOST_AUTO_TEST_SUITE(algo)
 		model_t equal = model_t(std::get<0>(res));
 		model_t bigger = model_t(std::get<0>(res));
 		std::transform(
-			std::get<vertex_set_t>(bigger).begin(),
-			std::get<vertex_set_t>(bigger).end(),
-			std::get<vertex_set_t>(bigger).begin(),
+			bigger.vertex_set().begin(),
+			bigger.vertex_set().end(),
+			bigger.vertex_set().begin(),
 			[] (vertex_t& v) { return vertex_t { { v.x() * 3 - 1, v.y() * 3 - 1, v.z() * 3 - 1  } }; } );
 		model_t smaller = model_t(std::get<0>(res));
 		std::transform(
-			std::get<vertex_set_t>(smaller).begin(),
-			std::get<vertex_set_t>(smaller).end(),
-			std::get<vertex_set_t>(smaller).begin(),
+			smaller.vertex_set().begin(),
+			smaller.vertex_set().end(),
+			smaller.vertex_set().begin(),
 			[] (vertex_t& v) { return vertex_t { { v.x() * 0.5 + 0.25, v.y() * 0.5 + 0.25, v.z() * 0.5 + 0.25  } }; } );
 		model_t cutting = model_t(std::get<0>(res));
 		std::transform(
-			std::get<vertex_set_t>(cutting).begin(),
-			std::get<vertex_set_t>(cutting).end(),
-			std::get<vertex_set_t>(cutting).begin(),
+			cutting.vertex_set().begin(),
+			cutting.vertex_set().end(),
+			cutting.vertex_set().begin(),
 			[] (vertex_t& v) { return vertex_t { { v.x() - 0.5, v.y() - 0.5, v.z() - 0.5  } }; } );
 		model_t outside = model_t(std::get<0>(res));
 		std::transform(
-			std::get<vertex_set_t>(outside).begin(),
-			std::get<vertex_set_t>(outside).end(),
-			std::get<vertex_set_t>(outside).begin(),
+			outside.vertex_set().begin(),
+			outside.vertex_set().end(),
+			outside.vertex_set().begin(),
 			[] (vertex_t& v) { return vertex_t { { v.x() + 2, v.y() + 2, v.z() + 2  } }; } );
 
 		aabb sbbox(smaller);
@@ -457,9 +457,9 @@ BOOST_AUTO_TEST_SUITE(algo)
 		scalar_t scale = dis(gen);
 
 		std::transform(
-			std::get<vertex_set_t>(cube).begin(),
-			std::get<vertex_set_t>(cube).end(),
-			std::get<vertex_set_t>(cube).begin(),
+			cube.vertex_set().begin(),
+			cube.vertex_set().end(),
+			cube.vertex_set().begin(),
 			[ scale ] (vertex_t& v) {
 				return vertex_t { { v.x() * scale, v.y() * scale, v.z() * scale } };
 			}
@@ -493,9 +493,9 @@ BOOST_AUTO_TEST_SUITE(algo)
 		scale = dis(gen);
 
 		std::transform(
-			std::get<vertex_set_t>(oct).begin(),
-			std::get<vertex_set_t>(oct).end(),
-			std::get<vertex_set_t>(oct).begin(),
+			oct.vertex_set().begin(),
+			oct.vertex_set().end(),
+			oct.vertex_set().begin(),
 			[ scale ] (vertex_t& v) {
 				return vertex_t { { v.x() * scale, v.y() * scale, v.z() * scale } };
 			}
