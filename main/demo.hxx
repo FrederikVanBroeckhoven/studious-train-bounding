@@ -1,0 +1,4 @@
+#ifndef DENO_HEADER_FILE
+#define DENO_HEADER_FILE
+
+#endif // DENO_HEADER_FILE

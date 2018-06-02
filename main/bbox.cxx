@@ -159,6 +159,21 @@ inline bool aabb::does_axis_int(
 		|| (max >= bmin && max <= bmax); 
 }
 
+const scalar_t aabb::len_x() const
+{ return std::abs(max_x() - min_x()); }
+
+const scalar_t aabb::len_y() const
+{ return std::abs(max_y() - min_y()); }
+
+const scalar_t aabb::len_z() const
+{ return std::abs(max_z() - min_z()); }
+
+const scalar_t aabb::volume() const
+{ return len_x() * len_y() * len_z(); }
+
+const scalar_t aabb::surface() const
+{ return 2 * (len_x() * len_y() + len_x() * len_z() + len_y() * len_z()); }
+
 std::ostream& operator<<(std::ostream& o, const aabb& bbox)
 { return o << "[" << bbox.min() << " - " << bbox.max() << "]"; }
 

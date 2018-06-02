@@ -81,6 +81,13 @@ public:
 	const coord_t max_y() const;
 	const coord_t max_z() const;
 
+	const scalar_t len_x() const;
+	const scalar_t len_y() const;
+	const scalar_t len_z() const;
+
+	const scalar_t volume() const;
+	const scalar_t surface() const;
+
 	friend std::ostream& operator<<(std::ostream& o, const aabb& bbox);
 
 };
